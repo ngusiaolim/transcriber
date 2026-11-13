@@ -1,0 +1,5 @@
+# Python 3.10+; torch >=2.6 supports safe loading checks for older checkpoints.
+torch>=2.6,<3
+transformers>=4.51,<5
+sentencepiece>=0.2,<0.3
+safetensors>=0.5,<1
