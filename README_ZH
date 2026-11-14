@@ -1,0 +1,38 @@
+# Transcriber
+Transcriber 轻量复现：《Transcriber: A Lightweight Dynamic Trigger Filter for Securing LLM-enabled Robots》，作者：Xiaolin Niu, Yuntao Wang, Zhou Su, Linkang Du。
+
+本工具基于 `parrot_paraphraser_on_T5` 对指令进行改写，使用 `all-MiniLM-L6-v2` 计算语义相似度，返回首个满足阈值条件的改写结果；3次尝试均不通过则返回原始指令。
+
+## 快速上手
+Python 3.10+，支持CPU。首次运行会从Hugging Face下载模型权重（合计约1GB），无需API Key。
+```bash
+python -m pip install -r requirements.txt
+python transcriber.py --text "Open the drawer slowly. c-p-s"
+```
+批量测试并保存改写候选、相似度与判定结果：
+```bash
+python transcriber.py --input examples.jsonl --output results/dual.jsonl
+python transcriber.py --input examples.jsonl --mode unconstrained --output results/unconstrained.jsonl
+```
+免下载模型，快速校验逻辑：
+```bash
+python -m unittest -v test_transcriber
+python transcriber.py --demo
+```
+`--demo` 使用模拟数据验证选择逻辑，不加载真实模型。`--help` 可查看随机种子、本地模型路径、CPU/CUDA、离线模式等参数。
+
+## 参数与范围
+- 温度：0.9；最大改写尝试次数：3
+- 相似度：归一化MiniLM向量点积
+- 接受区间：0.85 < 相似度 ≤ 0.95（遵循论文Algorithm 1，与公式12边界有区别）
+- 每次改写均基于原始输入；`unconstrained` 模式直接返回改写，不做阈值过滤
+
+`benign18.jsonl` 取自作者本地指令集前18条，未验证是否与论文评测集完全一致；`examples.jsonl` 包含7条论文触发模式示例。
+触发标签仅作为评测元数据，**不参与改写与筛选**。
+
+> ⚠️ 说明：本仓库仅复现过滤机制，不完整复现论文指标表；不含ONION、机器人执行、十次重复评测流程。仅靠相似度阈值无法保证任务正确性与安全性，原始输入仍可能携带触发串。
+论文未指定全部解码参数，本实现额外配置：top_p=0.95、top_k=50、num_beams=1、max_new_tokens=128；输入上限256 token。会保存每一轮候选记录，模型版本、硬件、采样随机性都会影响输出。
+
+## 示例运行记录
+在CPU、seed=42下跑通7个样例：双阈值模式放行5条，2条返回原文。该统计仅代表过滤器行为，不等于防御成功。
+样例结果：`dual.jsonl`、`unconstrained.jsonl`、`run_info.json`，仅用于冒烟测试，不是论文正式指标。依赖包版本更新后，采样结果会发生变化。
