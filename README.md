@@ -4,6 +4,8 @@ Minimal implementation of **Transcriber: A Lightweight Dynamic Trigger Filter fo
 
 [Read the paper](transcriber.pdf)
 
+[Quick overview](FAST_README.md)
+
 Transcriber rewrites an instruction with [Parrot T5](https://huggingface.co/prithivida/parrot_paraphraser_on_T5), measures semantic similarity with [MiniLM](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), and returns the first rewrite that passes both thresholds. If all three attempts fail, it returns the original instruction.
 
 ## Quick start
