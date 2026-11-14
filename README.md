@@ -2,7 +2,7 @@
 
 Minimal implementation of **Transcriber: A Lightweight Dynamic Trigger Filter for Securing LLM-enabled Robots** by Xiaolin Niu, Yuntao Wang, Zhou Su, and Linkang Du.
 
-[Read the paper](transcriber.pdf)
+[Read the paper](transcriber.pdf) · [View the implementation](transcriber.py)
 
 [Quick overview](FAST_README.md)
 
